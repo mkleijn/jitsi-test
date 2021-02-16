@@ -132,9 +132,9 @@ function onUserLeft(id) {
  */
 function onConnectionSuccess() {
     lobby = connection.initJitsiConference('lobby', confOptions);
-    lobby.addCommandListener('joinroom', values => {
-       
-    });
+    lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (from, message) => {
+        console.log('message from ' + from + ': ' + JSON.stringify(message));
+    });             
     lobby.join();
     
     room = connection.initJitsiConference('conference', confOptions);
