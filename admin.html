@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -68,6 +67,9 @@
               disconnect);
         }
 
+        
+        JitsiMeetJS.init();
+        
         connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
 
         connection.addEventListener(
@@ -80,7 +82,7 @@
           JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
           disconnect);
 
-        connection.connect({ id: 'adminuser'});
+        connection.connect();
   </script>
 </head>
 <body>
