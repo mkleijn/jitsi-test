@@ -7,16 +7,19 @@
     <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
     <script src="common.js"></script>
     <script>
-      function onConnectionSuccess() {
-        lobby = connection.initJitsiConference('lobby', confOptions);
-        lobby.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
-          var list = document.getElementById('userList');
-          var option = document.createElement('option');
-          option.text = 'User ' + id;
-          option.value = id;
-          list.add(option);
-        });
+        let lobby = null;
+        let connection = null;
         
+        function onConnectionSuccess() {
+            lobby = connection.initJitsiConference('lobby', confOptions);
+            lobby.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
+              var list = document.getElementById('userList');
+              var option = document.createElement('option');
+              option.text = 'User ' + id;
+              option.value = id;
+              list.add(option);
+        });
+
         lobby.on(JitsiMeetJS.events.conference.USER_LEFT, id => {
           var list = document.getElementById('userList');
           for (i = 0; i < list.length; i++) {
@@ -25,17 +28,17 @@
             }
           }
         });
-        
+
         lobby.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft); 
-        lobby.join();        
-      }
-      
-      
-      function onConnectionFailed() {
+            lobby.join();        
+        }
+
+
+        function onConnectionFailed() {
           console.error('Connection Failed!');
-      }  
-      
-      function disconnect() {
+        }  
+
+        function disconnect() {
           console.log('disconnect!');
           connection.removeEventListener(
               JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
@@ -46,21 +49,21 @@
           connection.removeEventListener(
               JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
               disconnect);
-      }
+        }
 
-      connection = new JitsiMeetJS.JitsiConnection(null, null, options);
+        connection = new JitsiMeetJS.JitsiConnection(null, null, options);
 
-      connection.addEventListener(
+        connection.addEventListener(
           JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
           onConnectionSuccess);
-      connection.addEventListener(
+        connection.addEventListener(
           JitsiMeetJS.events.connection.CONNECTION_FAILED,
           onConnectionFailed);
-      connection.addEventListener(
+        connection.addEventListener(
           JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
           disconnect);
 
-      connection.connect({ id: params.id});
+        connection.connect({ id: params.id});
   </script>
 </head>
 <body>
