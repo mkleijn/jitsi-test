@@ -135,6 +135,7 @@ function onConnectionSuccess() {
     lobby.addCommandListener('joinroom', values => {
        
     });
+    lobby.join();
     
     room = connection.initJitsiConference('conference', confOptions);
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
