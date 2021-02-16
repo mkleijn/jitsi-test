@@ -14,7 +14,7 @@
             var roomName =  window.prompt('room name?');
             for (i = 0; i < list.length; i++) {
                 if (list.options[i].selected) {
-                    lobby.sendEndpointMessage(list.options[i].value, { command: join, value: roomName });
+                    lobby.sendEndpointMessage(list.options[i].value, { type: 'custom-join-room', values: { room: roomName }});
                 }
             }
         }
