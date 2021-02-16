@@ -10,6 +10,15 @@
         let lobby = null;
         let connection = null;
         
+        function moveToRoom() {
+            var roomName =  window.prompt('room name?');
+            for (i = 0; i < list.length; i++) {
+                if (list.options[i].selected) {
+                    lobby.sendEndpointMessage(list.options[i].value, { command: join, value: roomName });
+                }
+            }
+        }
+        
         function onLobbyJoined() {
             console.log('joined lobby successfully!');
             var list = document.getElementById('userList');
@@ -86,6 +95,7 @@
   </script>
 </head>
 <body>
-  <select id="userList" size="20" multiple />
+  <select id="userList" size="20" multiple style="width: 300px" />
+    <button onclick='moveToRoom'>move to room</button>  
 </body>
 </html>
