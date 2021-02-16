@@ -21,14 +21,7 @@
         }
         
         function onLobbyJoined() {
-            console.log('joined lobby successfully!');
-            var list = document.getElementById('userList');
-            lobby.getParticipants().forEach(p => {
-                var option = document.createElement('option');
-                option.text = 'User ' + p.id;
-                option.value = p.id;
-                list.add(option);                
-            });                                          
+            console.log('joined lobby successfully!');                                         
         }
         
         function onUserJoinedLobby(id) {
