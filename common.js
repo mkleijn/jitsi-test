@@ -16,7 +16,3 @@ const initOptions = {
 const confOptions = {
     openBridgeChannel: true
 };
-
-
- JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
- JitsiMeetJS.init(initOptions);
