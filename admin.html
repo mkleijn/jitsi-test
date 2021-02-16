@@ -25,8 +25,8 @@
             var list = document.getElementById('userList');
             lobby.getParticipants().forEach(p => {
                 var option = document.createElement('option');
-                option.text = 'User ' + id;
-                option.value = id;
+                option.text = 'User ' + p.id;
+                option.value = p.id;
                 list.add(option);                
             });                                          
         }
