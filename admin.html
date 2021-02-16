@@ -11,25 +11,38 @@
         let lobby = null;
         let connection = null;
         
+        function onLobbyJoined() {
+            var list = document.getElementById('userList');
+            lobby.getParticipants().forEach(p => {
+                var option = document.createElement('option');
+                option.text = 'User ' + id;
+                option.value = id;
+                list.add(option);                
+            });                                          
+        }
+        
+        function onUserJoinedLobby(id) {
+            var list = document.getElementById('userList');
+            var option = document.createElement('option');
+            option.text = 'User ' + id;
+            option.value = id;
+            list.add(option);
+        }
+        
+        function onUserLeftLobby(id)  {
+          var list = document.getElementById('userList');
+          for (i = 0; i < list.length; i++) {
+            if (list.options[i].value == id) {
+              list.remove(id);
+            }
+          }
+        }
+        
         function onConnectionSuccess() {
             lobby = connection.initJitsiConference('lobby', confOptions);
-            lobby.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
-              var list = document.getElementById('userList');
-              var option = document.createElement('option');
-              option.text = 'User ' + id;
-              option.value = id;
-              list.add(option);
-            });
-
-            lobby.on(JitsiMeetJS.events.conference.USER_LEFT, id => {
-              var list = document.getElementById('userList');
-              for (i = 0; i < list.length; i++) {
-                if (list.options[i].value == id) {
-                  list.remove(id);
-                }
-              }
-            });
-
+            lobby.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoinedLobby);
+            lobby.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeftLobby);
+            lobby.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onLobbyJoined);
             lobby.join();        
         }
 
