@@ -18,9 +18,12 @@ const confOptions = {
 let connection = null;
 let isJoined = false;
 let room = null;
+let lobby = null;
 
 let localTracks = [];
 const remoteTracks = {};
+
+let params = new URLSearchParams(location.search);
 
 /**
  * Handles local tracks.
@@ -128,6 +131,11 @@ function onUserLeft(id) {
  * That function is called when connection is established successfully
  */
 function onConnectionSuccess() {
+    lobby = connection.initJitsiConference('lobby', confOptions);
+    lobby.addCommandListener('joinroom', values => {
+       
+    });
+    
     room = connection.initJitsiConference('conference', confOptions);
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
     room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, track => {
@@ -259,7 +267,7 @@ JitsiMeetJS.mediaDevices.addEventListener(
     JitsiMeetJS.events.mediaDevices.DEVICE_LIST_CHANGED,
     onDeviceListChanged);
 
-connection.connect();
+connection.connect({ id: params.id});
 
 JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video', 'desktop' ] })
     .then(onLocalTracks)
