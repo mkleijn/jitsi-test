@@ -19,18 +19,17 @@
               option.text = 'User ' + id;
               option.value = id;
               list.add(option);
-        });
+            });
 
-        lobby.on(JitsiMeetJS.events.conference.USER_LEFT, id => {
-          var list = document.getElementById('userList');
-          for (i = 0; i < list.length; i++) {
-            if (list.options[i].value == id) {
-              list.remove(id);
-            }
-          }
-        });
+            lobby.on(JitsiMeetJS.events.conference.USER_LEFT, id => {
+              var list = document.getElementById('userList');
+              for (i = 0; i < list.length; i++) {
+                if (list.options[i].value == id) {
+                  list.remove(id);
+                }
+              }
+            });
 
-        lobby.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft); 
             lobby.join();        
         }
 
