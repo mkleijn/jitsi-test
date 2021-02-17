@@ -133,11 +133,22 @@ function onUserLeft(id) {
 function onConnectionSuccess() {
     lobby = connection.initJitsiConference('lobby', confOptions);
     lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (from, message) => {
-        console.log('message from ' + from + ': ' + JSON.stringify(message));
-    });             
-    lobby.join();
+         if (message && message.command == 'join-room') {
+            if (room) {
+                room.leave().then(_ => { 
+                    joinRoom(message.values.room); 
+                });
+            } else {
+                joinRoom(message.values.room);
+            }
+         }
+    });
     
-    room = connection.initJitsiConference('conference', confOptions);
+    lobby.join();    
+}
+
+function joinRoom(name) {
+    room = connection.initJitsiConference(name, confOptions);
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
     room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, track => {
         console.log(`track removed!!!${track}`);
@@ -163,6 +174,7 @@ function onConnectionSuccess() {
         JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,
         () => console.log(`${room.getPhoneNumber()} - ${room.getPhonePin()}`));
     room.join();
+   
 }
 
 /**
