@@ -73,24 +73,28 @@
         }
 
         function onRemoteTrackAdded(track) {
-          if (!track.isLocal()) {
-            const remoteUserId = track.getParticipantId();
+            if (!track.isLocal()) {
+                const remoteUserId = track.getParticipantId();
 
-            if (!remoteTracks[remoteUserId]) { 
-              remoteTracks[remoteUserId] = [];
+                if (!remoteTracks[remoteUserId]) { 
+                  remoteTracks[remoteUserId] = [];
+                }
+
+                const index = remoteTracks[remoteUserId].push(track);
+                const trackType = track.getType();
+
+                const elem = document.createElement(trackType); //audio or video
+                elem.autoplay = true;
+                elem.id = `${remoteUserId}-${trackType}-${index}`;
+                document.documentElement.append(elem);          
+
+                track.attach(elem);            
             }
-            
-            const index = remoteTracks[remoteUserId].push(track);
-            const trackType = track.getType();
-            
-            const elem = document.createElement(trackType); //audio or video
-            elem.autoplay = true;
-            elem.id = `${remoteUserId}-${trackType}-${index}`;
-            document.documentElement.append(elem);          
-            
-            track.attach(elem);            
         }
-      }
+        
+        function onRemoteTrackRemoved(track) {
+        }
+
         
       function shareScreen() {
         JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(tracks => { room.addTrack(tracks[0]); });
