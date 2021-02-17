@@ -127,8 +127,8 @@ function onConnectionSuccess() {
             }
          }
     });
-    if (params.name) {
-        lobby.setDisplayName(params.name);
+    if (params.has('name')) {
+        lobby.setDisplayName(params.get('name'));
     }
     lobby.join();    
 }
@@ -160,8 +160,8 @@ function joinRoom(name) {
         JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,
         () => console.log(`${room.getPhoneNumber()} - ${room.getPhonePin()}`));
     
-    if (params.name) {
-        lobby.setDisplayName(params.name);
+    if (params.has('name')) {
+        room.setDisplayName(params.get('name'));
     }
     room.join();
    
