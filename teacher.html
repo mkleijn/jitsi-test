@@ -95,6 +95,12 @@
         function onRemoteTrackRemoved(track) {
         }
 
+        function onUserJoined(id, user) {
+            remoteTracks[id] = [];
+        }
+
+        function onUserLeft(id) {
+        }
         
       function shareScreen() {
         JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(tracks => { room.addTrack(tracks[0]); });
