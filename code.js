@@ -51,11 +51,14 @@ function onLocalTracks(tracks) {
     }
 }
 
+function onRemoteTrackRemoved(track) {
+}
+
 /**
  * Handles remote tracks
  * @param track JitsiTrack object
  */
-function onRemoteTrack(track) {
+function onRemoteTrackAdded(track) {
     if (track.isLocal()) {
         return;
     }
@@ -92,6 +95,11 @@ function onConferenceJoined() {
     for (let i = 0; i < localTracks.length; i++) {
         room.addTrack(localTracks[i]);
     }
+}
+
+function onUserJoined(id, user) {
+    console.log('user join');
+    remoteTracks[id] = [];
 }
 
 /**
@@ -135,31 +143,13 @@ function onConnectionSuccess() {
 
 function joinRoom(name) {
     room = connection.initJitsiConference(name, confOptions);
-    room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
-    room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, track => {
-        console.log(`track removed!!!${track}`);
-    });
-    room.on(
-        JitsiMeetJS.events.conference.CONFERENCE_JOINED,
-        onConferenceJoined);
-    room.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
-        console.log('user join');
-        remoteTracks[id] = [];
-    });
+    room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+    room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+    room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
+    room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
     room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
-    room.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, track => {
-        console.log(`${track.getType()} - ${track.isMuted()}`);
-    });
-    room.on(
-        JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED,
-        (userID, displayName) => console.log(`${userID} - ${displayName}`));
-    room.on(
-        JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED,
-        (userID, audioLevel) => console.log(`${userID} - ${audioLevel}`));
-    room.on(
-        JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,
-        () => console.log(`${room.getPhoneNumber()} - ${room.getPhonePin()}`));
-    
+    room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
+
     if (params.has('name')) {
         room.setDisplayName(params.get('name'));
     }
@@ -199,6 +189,7 @@ function unload() {
         localTracks[i].dispose();
     }
     if (room) room.leave();
+    if (lobby) lobby.leave();
     if (connection) connection.disconnect();
 }
 
