@@ -24,11 +24,11 @@
             console.log('joined lobby successfully!');                                         
         }
         
-        function onUserJoinedLobby(id) {
+        function onUserJoinedLobby(id, user) {
             console.log(`user {id} joined`);
             var list = document.getElementById('userList');
             var option = document.createElement('option');
-            option.text = 'User ' + id;
+            option.text = user.getDisplayName();
             option.value = id;
             list.add(option);
         }
