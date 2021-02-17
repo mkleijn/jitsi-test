@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
+    <script src="common.js"></script>
+    <script>
+        let params = new URLSearchParams(location.search);
+
+        let lobby = null;
+        let connection = null;
+        let localTracks = [];
+        let remoteTracks = [];
+        
+        function onLobbyJoined() {
+            console.log('joined lobby successfully!');                                         
+        }
+        
+        
+        function onConnectionFailed() {
+          console.error('Connection Failed!');
+        }  
+        
+        function onConnectionSuccess() {
+            lobby = connection.initJitsiConference('lobby', confOptions);
+            lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, (from, message) => {
+                 if (message && message.command == 'join-room') {
+                    if (room) {
+                        room.leave().then(_ => {
+                            isJoined = false;
+                            joinRoom(message.values.room); 
+                        });
+                    } else {
+                        joinRoom(message.values.room);
+                    }
+                 }
+            });
+            if (params.has('name')) {
+                lobby.setDisplayName(params.get('name'));
+            }
+            lobby.join();    
+        }
+
+        function joinRoom(name) {
+            room = connection.initJitsiConference(name, confOptions);
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+            room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+            room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
+            room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomLeft);            
+            room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+            room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
+            room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
+
+            if (params.has('name')) {
+                room.setDisplayName(params.get('name'));
+            }
+            room.join();
+        }
+        
+        function onRoomJoined() {
+          for (var i=0; i < localTracks.length; i++) {
+              room.addTrack(localTracks[i]);
+          }
+          
+          document.getElementById('shareScreenBtn').disabled = false;
+        }
+        
+        function onRoomLeft() {
+          document.getElementById('shareScreenBtn').disabled = true;        
+        }
+
+        function onRemoteTrackAdded(track) {
+          if (!track.isLocal()) {
+            const remoteUserId = track.getParticipantId();
+
+            if (!remoteTracks[remoteUserId]) { 
+              remoteTracks[remoteUserId] = [];
+            }
+            
+            const index = remoteTracks[remoteUserId].push(track);
+            const trackType = track.getType();
+            
+            const elem = document.createElement(trackType); //audio or video
+            elem.autoplay = true;
+            elem.id = `${remoteUserId}-${trackType}-${index}`;
+            document.documentElement.append(elem);          
+            
+            track.attach(elem);            
+        }
+      }
+        
+      function shareScreen() {
+        JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(tracks => { room.addTrack(tracks[0]); });
+      }
+
+      function disconnect() {
+        console.log('disconnecting');
+        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+      }
+
+
+      JitsiMeetJS.init();
+
+      connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+
+      connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+      connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+      connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+
+      connection.connect();
+
+      JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video'] }).then(tracks => {
+        localTracks.concat(tracks);
+      }).catch(error => {
+          throw error;
+      });
+  </script>
+</head>
+<body>
+<button id='shareScreenBtn' type='button' onclick='shareScreen()' disabled>share screen</button>
+</body>
+<html>
