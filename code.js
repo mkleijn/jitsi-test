@@ -40,7 +40,7 @@ function onLocalTracks(tracks) {
         if (localTracks[i].getType() === 'video') {
             $('body').append(`<video autoplay='1' id='localVideo${i}' />`);
             localTracks[i].attach($(`#localVideo${i}`)[0]);
-        } else if  {
+        } else {
             $('body').append(
                 `<audio autoplay='1' muted='true' id='localAudio${i}' />`);
             localTracks[i].attach($(`#localAudio${i}`)[0]);
