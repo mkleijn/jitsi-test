@@ -25,7 +25,7 @@
         }
         
         function onUserJoinedLobby(id, user) {
-            console.log(`user {id} joined`);
+            console.log(`user ${id} joined`);
             var list = document.getElementById('userList');
             var option = document.createElement('option');
             option.text = user.getDisplayName();
@@ -34,7 +34,7 @@
         }
         
         function onUserLeftLobby(id)  {
-          console.log(`user {id} left`);  
+          console.log(`user ${id} left`);  
           var list = document.getElementById('userList');
           for (i = 0; i < list.length; i++) {
             if (list.options[i].value == id) {
