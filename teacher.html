@@ -30,7 +30,6 @@
                  if (message && message.command == 'join-room') {
                     if (room) {
                         room.leave().then(_ => {
-                            isJoined = false;
                             joinRoom(message.values.room); 
                         });
                     } else {
@@ -49,7 +48,7 @@
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
             room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
-            room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomLeft);            
+            room.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onRoomLeft);            
             room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
             room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
             room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
