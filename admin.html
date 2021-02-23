@@ -59,15 +59,9 @@
 
         function disconnect() {
           console.log('disconnecting');
-          connection.removeEventListener(
-              JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-              onConnectionSuccess);
-          connection.removeEventListener(
-              JitsiMeetJS.events.connection.CONNECTION_FAILED,
-              onConnectionFailed);
-          connection.removeEventListener(
-              JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-              disconnect);
+          connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+          connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+          connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
         }
 
         
@@ -75,15 +69,9 @@
         
         connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
 
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,
-          onConnectionSuccess);
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_FAILED,
-          onConnectionFailed);
-        connection.addEventListener(
-          JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,
-          disconnect);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED,onConnectionSuccess);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED,onConnectionFailed);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED,disconnect);
 
         connection.connect();
   </script>

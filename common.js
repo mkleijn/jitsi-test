@@ -26,3 +26,24 @@ const initOptions = {
 const confOptions = {
     openBridgeChannel: true
 };
+
+//display name pre- and suffix
+const TEACHER_PREFIX = 'teacher/';
+const ER_PREFIX = 'experienceroom/';
+const VIDEOSCREEN_SUFFIX = '/video';
+const CONSOLE_SUFFIX = '/console';
+const PRESENTATION_SUFFIX = '/presentation';
+const TABLET_SUFFIX = '/tablet';
+
+//rooms
+const ROOM_LOBBY = 'lobby';
+
+//commands
+const CMD_JOIN_ROOM = 'join-room';
+
+
+
+	
+//resolutions
+const RES_THUMBNAIL = 180;
+const RES_FULLHD = 1080;
