@@ -59,6 +59,7 @@
 				
 				//only add experience room streams
 				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
+					console.log(`adding video track from ${participantId} to lobby`);
 					$('#lobbyVideogrid').append(`<li class="ui-state-default" data-participant="${participantId}"><video id="lobbyVid${participantId}" autoplay></video></li>`);
 					track.attach(document.getElementById(`lobbyVid${participantId}`));
 				}
@@ -71,6 +72,7 @@
 		        const remoteUser = lobby.getParticipantById(participantId);
 				
 				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
+					 console.log(`removing video track from ${participantId} from lobby`);
 					 var video = document.getElementById(`lobbyVid${participantId}`);
 					 track.detach(video);
 					 video.parentNode.remove();
