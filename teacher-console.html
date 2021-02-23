@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <meta charset="UTF-8">
+    <title>Teacher console</title>
+	<style>
+		#feedback { font-size: 1.4em; }
+		#lobbyVideogrid .ui-selecting { border: solid 2px #FECA40; }
+		#lobbyVideogrid .ui-selected { border: solid 2px #F39814; }
+		#lobbyVideogrid { list-style-type: none; margin: 0; padding: 0; width: 1000px; }
+		#lobbyVideogrid li { margin: 3px; padding: 1px; float: left; width: 160px; height: 90px; }
+	</style>
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
+    <script src="common.js?v=1"></script>
+    <script>
+		let params = new URLSearchParams(location.search);
+		let paramName = (params.has('name') ? params.get('name') : Math.floor(Math.random() * 10000))
+		let displayName = TEACHER_PREFIX + paramName + CONSOLE_SUFFIX;
+		let lobby = null;
+		let room = null;
+		let joinedToRoom = false;
+		let connection = null;
+		
+		function onLobbyJoined() {
+		    console.log('joined lobby successfully!');                                         
+		}
+		
+		
+		function onConnectionFailed() {
+			console.error('Connection Failed!');
+		}  
+		
+		function onConnectionSuccess() {
+		    console.log('conncection successfull!');
+		    lobby = connection.initJitsiConference(ROOM_LOBBY, confOptions);
+		    lobby.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoinedLobby);
+		    lobby.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeftLobby);
+		    lobby.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onLobbyJoined);			
+		    lobby.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+		    lobby.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+			lobby.setDisplayName(displayName);
+		    lobby.join();        
+		}
+		
+		function onRemoteTrackAdded(track) {
+		    if (!track.isLocal() && track.getType() === 'video') {
+				const participantId = track.getParticipantId(); 
+		        const remoteUser = lobby.getParticipantById(participantId);
+				
+				//only add experience room streams
+				if (user.displayName.startsWith(ER_PREFIX)) {
+					$('#lobbyVideogrid').append(`<li class="ui-state-default" data-participant="${participantId}"><video id="lobbyVid${participantId}" autoplay></video></li>`);
+					track.attach($(`lobbyVid${participantId}`)[0]);
+				}
+			}			
+		}
+		
+		function onRemoteTrackRemoved(track) {
+			if (!track.isLocal() && track.getType() === 'video') {
+				const participantId = track.getParticipantId(); 
+		        const remoteUser = lobby.getParticipantById(participantId);
+				
+				if (user.displayName.startsWith(ER_PREFIX)) {
+					 var video = document.getElementById('lobbyVid' + participantId);
+					 track.detach(video);
+					 video.remove();
+				}
+			}
+		}
+		
+		function createRoom(name, invitedIds) {
+		    room = connection.initJitsiConference(name, confOptions);
+		    room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
+		    room.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onRoomLeft);            
+		    room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
+		    room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
+		    room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
+			room.setDisplayName(displayName);
+		    room.join();
+			
+			//send invite to peers through lobby channel
+			for (var id in invitedIds) {
+				lobby.sendEndpointMessage(id, { command: CMD_JOIN_ROOM, values: { room: name }});
+		    }
+		}
+		
+		function onRoomJoined() {
+			joinedToRoom = true;          
+			document.getElementById('shareScreenBtn').disabled = false;
+		}
+		
+		function onRoomLeft() {
+			joinedToRoom = false;
+			document.getElementById('shareScreenBtn').disabled = true;        
+		}
+		
+		
+		function onUserJoined(id, user) {
+		
+		}
+		
+		function onUserLeft(id) {
+		}
+		
+		function shareScreen() {
+			JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(
+				tracks => { 
+					for (var track in tracks) {
+						room.addTrack(track); 
+					}
+				});
+		}
+		
+		function connectToRoom() {
+			const userIds = [];
+			$('#lobbyVideogrid li.ui-selected').forEach(item => userIds.push(item.dataset.participant));
+			createRoom(paramName, userIds);
+		}
+		
+		function disconnect() {
+			console.log('disconnecting');
+			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+		}
+		
+		
+		JitsiMeetJS.init();		
+		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+		connection.connect();
+		
+		
+		$(function() {
+			$("#lobbyVideogrid").selectable();
+			$("#roomPage").hide();
+		});
+  </script>
+</head>
+<body>
+  <div id="lobbyPage">
+  	<ol id="lobbyVideogrid"></ol>
+	<button id="connectButton" type='button' onclick='connectToRoom()'>Connect to selected rooms</button>
+  </div>
+  <div id="roomPage">
+	<button id='shareScreenBtn' type='button' onclick='shareScreen()' disabled>share screen</button>
+  </div>
+</body>
+<html>

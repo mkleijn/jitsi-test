@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Experience room video screen</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
+    <script src="common.js?v=1"></script>
+    <script>
+        let params = new URLSearchParams(location.search);
+		let displayName = ER_PREFIX + (params.has('name') ? params.get('name') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
+        let lobby = null;
+        let room = null;
+		let joinedToRoom = false;
+        let connection = null;
+		let localTracks = null;
+		        
+        function onConnectionFailed() {
+          console.error('Connection Failed!');
+        }  
+        
+		function onConnectionSuccess() {
+            console.log('conncection successfull!');
+            lobby = connection.initJitsiConference(ROOM_LOBBY, confOptions);
+            lobby.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onLobbyJoined);
+			lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, onLobbyMessageReceived);
+			lobby.setDisplayName(displayName);
+            lobby.join();        
+        }
+		
+		function disconnect() {
+	        console.log('disconnecting');
+	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+	    }
+		
+		function onLobbyJoined() {
+			lobby.setSenderVideoConstraint(RES_THUMBNAIL);  
+			for (var localTrack in localTracks) {
+				if (localTrack.getType() === 'video') {
+	            	lobby.addTrack(localTrack);
+				}
+	        }
+		}
+		
+		function onLobbyMessageReceived(from, message) {
+			if (message && message.command === CMD_JOIN_ROOM) {
+				if (room && joinedToRoom) {
+				    room.leave().then(_ => {
+				        joinRoom(message.values.room); 
+				    });
+				} else {
+				    joinRoom(message.values.room);
+				}
+            }
+		}
+		
+		function joinRoom(name) {
+            room = connection.initJitsiConference(name, confOptions);
+            room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
+            room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
+            room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
+            room.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onRoomLeft);			
+			room.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, onRoomMessageReceived);        
+			room.setDisplayName(displayName);
+            room.join();
+        }
+		
+		function onRoomJoined() {
+			room.setSenderVideoConstraint(RES_FULLHD);
+			for (var localTrack in localTracks) {
+	            room.addTrack(localTrack);
+	        }
+		}
+		
+		function onRoomLeft() {
+			
+		}
+		
+		function onRoomMessageReceived(from, message) {
+			
+		}
+		
+        function onRemoteTrackAdded(track) {
+		    if (!track.isLocal()) {
+				const participantId = track.getParticipantId(); 
+				if (track.getType() === 'video') {
+					$('body').append(`<video id="roomVid${participantId}" autoplay></video>`);
+					track.attach($(`roomVid${participantId}`)[0]);
+				} else {
+					$('body').append(`<audio id="roomAud${participantId}" autoplay></audio>`);
+					track.attach($(`roomAud${participantId}`)[0]);					
+				}
+			}		
+		}
+		
+		function onRemoteTrackRemoved(track) {
+		    if (!track.isLocal()) {
+				const participantId = track.getParticipantId(); 
+				const node = documentGetElementbyId(`room$(track.getType() === 'video' ? 'Vid' : 'Aud')${participantId}`);
+				track.detach(node);
+				node.remove();
+			}			
+		}
+		
+		
+		JitsiMeetJS.init();
+		
+		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+		
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+		
+		connection.connect();	
+		
+		JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video'] }).then(tracks => { 
+			localTracks = tracks;      	
+		}).catch(error => {
+		  throw error;
+		});
+  </script>
+</head>
+<body>
+</body>
+<html>
