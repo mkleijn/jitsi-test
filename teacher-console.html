@@ -60,7 +60,7 @@
 				//only add experience room streams
 				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
 					$('#lobbyVideogrid').append(`<li class="ui-state-default" data-participant="${participantId}"><video id="lobbyVid${participantId}" autoplay></video></li>`);
-					track.attach($(`lobbyVid${participantId}`)[0]);
+					track.attach(document.getElementById(`lobbyVid${participantId}`));
 				}
 			}			
 		}
@@ -71,9 +71,9 @@
 		        const remoteUser = lobby.getParticipantById(participantId);
 				
 				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
-					 var video = document.getElementById('lobbyVid' + participantId);
+					 var video = document.getElementById(`lobbyVid${participantId}`);
 					 track.detach(video);
-					 video.remove();
+					 video.parentNode.remove();
 				}
 			}
 		}
