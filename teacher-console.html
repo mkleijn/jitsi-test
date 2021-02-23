@@ -125,7 +125,7 @@
 		
 		function connectToRoom() {
 			const userIds = [];
-			$('#lobbyVideogrid li.ui-selected').forEach(item => userIds.push(item.dataset.participant));
+			$('#lobbyVideogrid li.ui-selected').each(item => userIds.push(item.dataset.participant));
 			createRoom(paramName, userIds);
 		}
 		
