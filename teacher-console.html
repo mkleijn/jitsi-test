@@ -28,6 +28,13 @@
 		    console.log('joined lobby successfully!');                                         
 		}
 		
+	    	function onUserJoinedLobby(id, user) {
+		    console.log(`User ${id} joined the lobby`);   
+		}
+	    
+	    	function onUserLeftLobby(id, user) {
+		    console.log(`User ${id} left the lobby`);  			
+		}
 		
 		function onConnectionFailed() {
 			console.error('Connection Failed!');
