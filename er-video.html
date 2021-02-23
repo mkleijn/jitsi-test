@@ -8,7 +8,7 @@
     <script src="common.js?v=1"></script>
     <script>
         let params = new URLSearchParams(location.search);
-		let displayName = ER_PREFIX + (params.has('name') ? params.get('name') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
+		let displayName = ER_PREFIX + (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
         let lobby = null;
         let room = null;
 		let joinedToRoom = false;
