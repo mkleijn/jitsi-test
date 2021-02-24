@@ -170,7 +170,12 @@
 			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
 			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
 		}
-		
+
+        function unload() {
+            if (room) room.leave();
+            if (lobby) lobby.leave();
+            if (connection) connection.disconnect();
+        }
 		
 		JitsiMeetJS.init();		
 		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
@@ -187,7 +192,7 @@
   </script>
 </head>
 <body>
-  <div id="lobbyPage">
+  <div id="lobbyPage" onunload="unload();">
   	<ol id="lobbyVideogrid"></ol>
 	<button id="connectButton" type='button' onclick='connectToRoom()'>Connect to selected rooms</button>
   </div>

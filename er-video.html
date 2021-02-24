@@ -103,6 +103,16 @@
 				node.remove();
 			}			
 		}
+
+		function unload() {
+            for (let i = 0; i < localTracks.length; i++) {
+                localTracks[i].dispose();
+			}
+
+			if (room) room.leave();
+			if (lobby) lobby.leave();
+            if (connection) connection.disconnect();
+        }
 		
 		
 		JitsiMeetJS.init();
@@ -123,6 +133,6 @@
 		});
   </script>
 </head>
-<body>
+<body onunload="unload();">
 </body>
 <html>

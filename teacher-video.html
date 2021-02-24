@@ -45,7 +45,7 @@
 		}
 		
 		function onLobbyMessageReceived(from, message) {
-			if (/* TODO from == my teacher console */ message && message.command === CMD_JOIN_ROOM) {
+            if (message && message.command === CMD_JOIN_ROOM) {
 				if (room && joinedToRoom) {
 				    room.leave().then(_ => {
 				        joinRoom(message.values.room); 
@@ -81,14 +81,39 @@
 		function onRoomMessageReceived(from, message) {
 			
 		}
-		
+
+
         function onRemoteTrackAdded(track) {
-		
-		}
-		
-		function onRemoteTrackRemoved(track) {
-		
-		}
+            if (!track.isLocal()) {
+                const participantId = track.getParticipantId();
+                if (track.getType() === 'video') {
+                    $('body').append(`<video id="roomVid${participantId}" autoplay></video>`);
+                    track.attach($(`roomVid${participantId}`)[0]);
+                } else {
+                    $('body').append(`<audio id="roomAud${participantId}" autoplay></audio>`);
+                    track.attach($(`roomAud${participantId}`)[0]);
+                }
+            }
+        }
+
+        function onRemoteTrackRemoved(track) {
+            if (!track.isLocal()) {
+                const participantId = track.getParticipantId();
+                const node = documentGetElementbyId(`room$(track.getType() === 'video' ? 'Vid' : 'Aud')${participantId}`);
+                track.detach(node);
+                node.remove();
+            }
+        }
+
+        function unload() {
+            for (let i = 0; i < localTracks.length; i++) {
+                localTracks[i].dispose();
+            }
+
+            if (room) room.leave();
+            if (lobby) lobby.leave();
+            if (connection) connection.disconnect();
+        }
 		
 		
 		JitsiMeetJS.init();
@@ -103,12 +128,13 @@
 		
 		JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video'] }).then(tracks => { 
 			localTracks = tracks;
+            showLocalTracks();
             connection.connect();
 		}).catch(error => {
 		  throw error;
 		});
   </script>
 </head>
-<body>
+<body onunload="unload();">
 </body>
 <html>
