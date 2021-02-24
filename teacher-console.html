@@ -25,17 +25,32 @@
 		let room = null;
 		let joinedToRoom = false;
 		let connection = null;
-		
+		let lobbyUserTree = [];
+
 		function onLobbyJoined() {
 		    console.log('joined lobby successfully!');                                         
 		}
 		
-	    	function onUserJoinedLobby(id, user) {
-		    console.log(`User ${id} joined the lobby`);   
+		function onUserJoinedLobby(id, user) {
+			var nameparts = user.getDisplayName().split('/');
+
+			if (lobbyUserTree[nameparts[0]] == undefined) {
+				lobbyUserTree[nameparts[0]] = [];
+			}
+			if (lobbyUserTree[nameparts[0]][nameparts[1]] == undefined) {
+				lobbyUserTree[nameparts[0]][nameparts[1]] = [];
+			}
+
+			lobbyUserTree[nameparts[0]][nameparts[1]][nameparts[2]] = user;
+            console.log(`User ${id} (${user.getDisplayName()}) joined the lobby`);   
+
 		}
 	    
-	    	function onUserLeftLobby(id, user) {
-		    console.log(`User ${id} left the lobby`);  			
+	    function onUserLeftLobby(id, user) {
+            var nameparts = user.getDisplayName().split('/');
+			lobbyUserTree[nameparts[0]][nameparts[1]][nameparts[2]] = undefined;
+
+            console.log(`User ${id} (${user.getDisplayName()}) left the lobby`);   
 		}
 		
 		function onConnectionFailed() {
@@ -62,7 +77,7 @@
 				//only add experience room streams
 				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
 					console.log(`adding video track from ${participantId} to lobby`);
-					$('#lobbyVideogrid').append(`<li class="ui-state-default" data-participant="${participantId}"><video id="lobbyVid${participantId}" autoplay></video></li>`);
+                    $('#lobbyVideogrid').append(`<li class="ui-state-default" data-participant="${participantId}" data-displayname="${remoteUser.getDisplayName()}"><video id="lobbyVid${participantId}" autoplay></video></li>`);
 					track.attach(document.getElementById(`lobbyVid${participantId}`));
 				}
 			}			
@@ -73,7 +88,7 @@
 				const participantId = track.getParticipantId(); 
 		        const remoteUser = lobby.getParticipantById(participantId);
 				
-				if (remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
+				if (!remoteUser || remoteUser.getDisplayName().startsWith(ER_PREFIX)) {
 					 console.log(`removing video track from ${participantId} from lobby`);
 					 var video = document.getElementById(`lobbyVid${participantId}`);
 					 track.detach(video);
@@ -110,7 +125,7 @@
 		
 		
 		function onUserJoined(id, user) {
-		
+			
 		}
 		
 		function onUserLeft(id) {
@@ -126,8 +141,26 @@
 		}
 		
 		function connectToRoom() {
-			const userIds = [];
-			$('#lobbyVideogrid li.ui-selected').each((_, item) => userIds.push(item.dataset.participant));
+            const usersToInvite = [];
+			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
+			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
+				var nameParts = item.dataset.userName.split('/');
+
+				for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
+					if (!usersToInvite.includes(user.getId())) {
+						usersToInvite.push(user.getId());
+					}
+                }
+			});
+
+			//also include own components (so teacher/<my id>/*)
+			var nameParts = item.dataset.userName.split('/');
+			for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
+				if (!user.getDisplayName() == displayName && !usersToInvite.includes(user.getId())) {
+                    usersToInvite.push(user.getId());
+                }
+			}
+
 			createRoom(paramName, userIds);
 		}
 		
