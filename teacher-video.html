@@ -135,7 +135,6 @@
 		
 		JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video'] }).then(tracks => { 
 			localTracks = tracks;
-            showLocalTracks();
             connection.connect();
 		}).catch(error => {
 		  throw error;
