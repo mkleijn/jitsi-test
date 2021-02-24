@@ -25,7 +25,7 @@
 		let room = null;
 		let joinedToRoom = false;
 		let connection = null;
-		let lobbyUserTree = [];
+		let peersTree = [];
 
 		function onLobbyJoined() {
 		    console.log('joined lobby successfully!');                                         
@@ -34,21 +34,21 @@
 		function onUserJoinedLobby(id, user) {
 			var nameparts = user.getDisplayName().split('/');
 
-			if (lobbyUserTree[nameparts[0]] == undefined) {
-				lobbyUserTree[nameparts[0]] = [];
+			if (peersTree[nameparts[0]] == undefined) {
+				peersTree[nameparts[0]] = [];
 			}
-			if (lobbyUserTree[nameparts[0]][nameparts[1]] == undefined) {
-				lobbyUserTree[nameparts[0]][nameparts[1]] = [];
+			if (peersTree[nameparts[0]][nameparts[1]] == undefined) {
+				peersTree[nameparts[0]][nameparts[1]] = [];
 			}
 
-			lobbyUserTree[nameparts[0]][nameparts[1]][nameparts[2]] = user;
+			peersTree[nameparts[0]][nameparts[1]][nameparts[2]] = user;
             console.log(`User ${id} (${user.getDisplayName()}) joined the lobby`);   
 
 		}
 	    
 	    function onUserLeftLobby(id, user) {
             var nameparts = user.getDisplayName().split('/');
-			lobbyUserTree[nameparts[0]][nameparts[1]][nameparts[2]] = undefined;
+			peersTree[nameparts[0]][nameparts[1]][nameparts[2]] = undefined;
 
             console.log(`User ${id} (${user.getDisplayName()}) left the lobby`);   
 		}
@@ -145,7 +145,7 @@
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				const nameParts = item.dataset.displayname.split('/');
-				const tree = lobbyUserTree[nameParts[0]][nameParts[1]];
+				const tree = peersTree[nameParts[0]][nameParts[1]];
 
 				for (const user in tree) {
 					if (!usersToInvite.includes(tree[user].getId())) {
@@ -156,7 +156,7 @@
 
 			//also include own components (so teacher/<my id>/*)
             const nameParts = displayName.split('/');
-            const tree = lobbyUserTree[nameParts[0]][nameParts[1]];
+            const tree = peersTree[nameParts[0]][nameParts[1]];
 			for (const user in tree) {
 				if (!tree[user].getDisplayName() == displayName && !usersToInvite.includes(tree[user].getId())) {
                     usersToInvite.push(tree[user].getId());
