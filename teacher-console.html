@@ -146,7 +146,7 @@
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				var nameParts = item.dataset.displayname.split('/');
 
-				for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
+				for (const user of lobbyUserTree[nameParts[0]][nameParts[1]]) {
 					if (!usersToInvite.includes(user.getId())) {
 						usersToInvite.push(user.getId());
 					}
@@ -155,7 +155,7 @@
 
 			//also include own components (so teacher/<my id>/*)
             var nameParts = displayName.split('/');
-			for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
+			for (const user of lobbyUserTree[nameParts[0]][nameParts[1]]) {
 				if (!user.getDisplayName() == displayName && !usersToInvite.includes(user.getId())) {
                     usersToInvite.push(user.getId());
                 }
