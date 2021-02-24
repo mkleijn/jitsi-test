@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head lang="en">
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -93,8 +93,8 @@
 		    room.join();
 			
 			//send invite to peers through lobby channel
-			for (var id in invitedIds) {
-				lobby.sendEndpointMessage(id, { command: CMD_JOIN_ROOM, values: { room: name }});
+			for (const i = 0; i < invitedIds.length; i++) {
+                lobby.sendEndpointMessage(invitedIds[i], { command: CMD_JOIN_ROOM, values: { room: name }});
 		    }
 		}
 		
@@ -119,8 +119,8 @@
 		function shareScreen() {
 			JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(
 				tracks => { 
-					for (var track in tracks) {
-						room.addTrack(track); 
+					for (const i = 0; i < tracks.length; i++) {
+						room.addTrack(tracks[i]); 
 					}
 				});
 		}
