@@ -37,7 +37,7 @@
 		
 		function onLobbyJoined() {
 			lobby.setSenderVideoConstraint(RES_THUMBNAIL);  
-			for (const i = 0; i < localTracks.length; i++) {
+			for (var i = 0; i < localTracks.length; i++) {
 				if (localTracks[i].getType() === 'video') {
 	            	lobby.addTrack(localTracks[i]);
 				}
@@ -69,7 +69,7 @@
 		
 		function onRoomJoined() {
 			room.setSenderVideoConstraint(RES_FULLHD);
-			for (const i = 0; i < localTracks.length; i++) {
+			for (var i = 0; i < localTracks.length; i++) {
 	            room.addTrack(localTracks[i]);
 	        }
 		}
