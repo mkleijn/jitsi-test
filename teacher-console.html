@@ -144,20 +144,22 @@
             const usersToInvite = [];
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
-				var nameParts = item.dataset.displayname.split('/');
+				const nameParts = item.dataset.displayname.split('/');
+				const tree = lobbyUserTree[nameParts[0]][nameParts[1]];
 
-				for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
-					if (!usersToInvite.includes(user.getId())) {
-						usersToInvite.push(user.getId());
+				for (const user in tree) {
+					if (!usersToInvite.includes(tree[user].getId())) {
+						usersToInvite.push(tree[user].getId());
 					}
                 }
 			});
 
 			//also include own components (so teacher/<my id>/*)
-            var nameParts = displayName.split('/');
-			for (const user in lobbyUserTree[nameParts[0]][nameParts[1]]) {
-				if (!user.getDisplayName() == displayName && !usersToInvite.includes(user.getId())) {
-                    usersToInvite.push(user.getId());
+            const nameParts = displayName.split('/');
+            const tree = lobbyUserTree[nameParts[0]][nameParts[1]];
+			for (const user in tree) {
+				if (!tree[user].getDisplayName() == displayName && !usersToInvite.includes(tree[user].getId())) {
+                    usersToInvite.push(tree[user].getId());
                 }
 			}
 
