@@ -19,7 +19,7 @@
     <script src="common.js?v=1"></script>
     <script>
 		let params = new URLSearchParams(location.search);
-		let paramName = (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000))
+		let paramName = (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000).toString())
 		let displayName = TEACHER_PREFIX + paramName + CONSOLE_SUFFIX;
 		let lobby = null;
 		let room = null;
