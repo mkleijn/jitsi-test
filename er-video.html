@@ -14,8 +14,6 @@
 		let joinedToRoom = false;
         let connection = null;
 		let localTracks = null;
-		let roomConnection = null;
-
 		        
         function onConnectionFailed() {
           console.error('Connection Failed!');
@@ -28,14 +26,6 @@
 			lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, onLobbyMessageReceived);
 			lobby.setDisplayName(displayName);
             lobby.join();        
-		}
-
-        function onRoomConnectionFailed() {
-            console.error('RoomConnection Failed!');
-        }
-
-        function onRoomConnectionSuccess() {
-            console.log('Room conncection successfull!');
         }
 		
 		function disconnect() {
@@ -43,9 +33,7 @@
 	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
 	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
 	        connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
-		}
-
-
+	    }
 		
 		function onLobbyJoined() {
 			lobby.setSenderVideoConstraint(RES_THUMBNAIL);  
@@ -70,7 +58,7 @@
 		}
 		
 		function joinRoom(name) {
-            room = roomConnection.initJitsiConference(name, confOptions);
+            room = connection.initJitsiConference(name, confOptions);
             room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrackAdded);
             room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoteTrackRemoved);
             room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
@@ -133,7 +121,6 @@
 			}
 
 			if (room) room.leave();
-			if (roomConnection) roomConnection.disconnect();
 			if (lobby) lobby.leave();
             if (connection) connection.disconnect();
         }
@@ -146,11 +133,7 @@
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
-
-        roomConnection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
-        roomConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onRoomConnectionSuccess);
-        roomConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onRoomConnectionFailed);
-
+		
 			
 		
 		JitsiMeetJS.createLocalTracks({ devices: [ 'audio', 'video'] }).then(tracks => { 
