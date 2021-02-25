@@ -88,7 +88,7 @@
                 const participantId = track.getParticipantId();
                 const remoteUser = room.getParticipantById(participantId);
                 const type = track.getType();
-                console.log(`adding ${type} track from ${remoteUser.getUserName()} to room ${room.getName()}`);
+                console.log(`adding ${type} track from ${remoteUser.getDisplayName()} to room ${room.getName()}`);
 
                 const elem = document.createElement(type);
                 elem.autoplay = true;
@@ -103,7 +103,7 @@
                 const participantId = track.getParticipantId();
                 const remoteUser = room.getParticipantById(participantId);
                 const type = track.getType();
-                console.log(`removing ${type} track from ${remoteUser ? remoteUser.getUserName() : 'unknown user '} from room ${room.getName()}`);
+                console.log(`removing ${type} track from ${remoteUser ? remoteUser.getDisplayName() : 'unknown user '} from room ${room.getName()}`);
 
                 const elem = document.getElementById(`room_${type}_{participantId}`);
                 if (elem) {
