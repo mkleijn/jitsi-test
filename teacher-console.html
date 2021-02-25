@@ -180,6 +180,7 @@
         }
 		
 		JitsiMeetJS.init();		
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
 		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);

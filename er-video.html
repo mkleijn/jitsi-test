@@ -43,7 +43,8 @@
 				}
 	        }
 		}
-		
+
+		//message handler for any messages broadcast in Lobby room
 		function onLobbyMessageReceived(from, message) {
 			if (message && message.command === CMD_JOIN_ROOM) {
 				if (room && joinedToRoom) {
@@ -77,32 +78,42 @@
 		function onRoomLeft() {
 			
 		}
-		
+
+		//message handler for any message broadcast in room
 		function onRoomMessageReceived(from, message) {
 			
 		}
-		
+
+
         function onRemoteTrackAdded(track) {
-		    if (!track.isLocal()) {
-				const participantId = track.getParticipantId(); 
-				if (track.getType() === 'video') {
-					$('body').append(`<video id="roomVid${participantId}" autoplay></video>`);
-					track.attach($(`roomVid${participantId}`)[0]);
-				} else {
-					$('body').append(`<audio id="roomAud${participantId}" autoplay></audio>`);
-					track.attach($(`roomAud${participantId}`)[0]);					
-				}
-			}		
-		}
-		
-		function onRemoteTrackRemoved(track) {
-		    if (!track.isLocal()) {
-				const participantId = track.getParticipantId(); 
-				const node = documentGetElementbyId(`room$(track.getType() === 'video' ? 'Vid' : 'Aud')${participantId}`);
-				track.detach(node);
-				node.remove();
-			}			
-		}
+            if (!track.isLocal()) {
+                const participantId = track.getParticipantId();
+                const remoteUser = room.getParticipantById(participantId);
+                const type = track.getType();
+                console.log(`adding ${type} track from ${remoteUser.getUserName()} to room ${room.getName()}`);
+
+                const elem = document.createElement(type);
+                elem.autoplay = true;
+                elem.id = `room_${type}_{participantId}`;
+                document.body.append(elem);
+                track.attach(elem);
+            }
+        }
+
+        function onRemoteTrackRemoved(track) {
+            if (!track.isLocal()) {
+                const participantId = track.getParticipantId();
+                const remoteUser = room.getParticipantById(participantId);
+                const type = track.getType();
+                console.log(`removing ${type} track from ${remoteUser ? remoteUser.getUserName() : 'unknown user '} from room ${room.getName()}`);
+
+                const elem = document.getElementById(`room_${type}_{participantId}`);
+                if (elem) {
+                    track.detach(elem);
+                    elem.remove();
+                }
+            }
+        }
 
 		function unload() {
             for (let i = 0; i < localTracks.length; i++) {
@@ -116,7 +127,7 @@
 		
 		
 		JitsiMeetJS.init();
-		
+        JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
 		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
 		
 		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
