@@ -158,7 +158,7 @@
             const nameParts = displayName.split('/');
             const tree = peersTree[nameParts[0]][nameParts[1]];
 			for (const user in tree) {
-				if (!tree[user].getDisplayName() == displayName && !usersToInvite.includes(tree[user].getId())) {
+				if (!usersToInvite.includes(tree[user].getId())) {
                     usersToInvite.push(tree[user].getId());
                 }
 			}
