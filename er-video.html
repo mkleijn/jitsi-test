@@ -29,7 +29,7 @@
             lobby.join();        
         }
 		
-        function onLobbydisconnect() {
+        function onLobbyDisconnect() {
 	        console.log('lobby disconnecting');
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onLobbyConnectionSuccess);
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onLobbyConnectionFailed);
@@ -41,7 +41,7 @@
             console.log('room conncection successfull!');
         }
 
-        function onRoomdisconnect() {
+        function onRoomDisconnect() {
             console.log('room disconnecting');
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onRoomConnectionSuccess);
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onRoomConnectionFailed);

@@ -33,7 +33,7 @@
 	        console.log('disconnecting from lobby');
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onLobbyConnectionSuccess);
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onLobbyConnectionFailed);
-            lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onRoomDisconnect);
+            lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onLobbyDisconnect);
         }
 
         function onRoomConnectionFailed() {
