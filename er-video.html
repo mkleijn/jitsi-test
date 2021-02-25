@@ -128,14 +128,15 @@
             }
         }
 
-		function unload() {
+        function unload() {
             for (let i = 0; i < localTracks.length; i++) {
                 localTracks[i].dispose();
-			}
+            }
 
-			if (room) room.leave();
-			if (lobby) lobby.leave();
-            if (connection) connection.disconnect();
+            if (room) room.leave();
+            if (lobby) lobby.leave();
+            if (roomConnection) roomConnection.disconnect();
+            if (lobbyConnection) lobbyConnection.disconnect();
         }
 		
 		
