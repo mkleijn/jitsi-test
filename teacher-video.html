@@ -22,7 +22,7 @@
         
 		function onLobbyConnectionSuccess() {
             console.log('conncection successfull!');
-            lobby = connection.initJitsiConference(ROOM_LOBBY, confOptions);
+            lobby = lobbyConnection.initJitsiConference(ROOM_LOBBY, confOptions);
             lobby.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onLobbyJoined);
 			lobby.on(JitsiMeetJS.events.conference.ENDPOINT_MESSAGE_RECEIVED, onLobbyMessageReceived);
 			lobby.setDisplayName(displayName);

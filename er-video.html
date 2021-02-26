@@ -36,6 +36,9 @@
             lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onLobbyDisconnect);
 	    }
 
+        function onRoomConnectionFailed() {
+            console.error('Connection Failed!');
+        }  
 
         function onRoomConnectionSuccess() {
             console.log('room conncection successfull!');
