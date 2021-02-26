@@ -5,7 +5,7 @@
     <title>Teacher video screen</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
-    <script src="common.js?v=2"></script>
+    <script src="common.js?v=3"></script>
     <script>
         let params = new URLSearchParams(location.search);
 		let displayName = TEACHER_PREFIX + (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
@@ -108,7 +108,7 @@
 
                 const elem = document.createElement(type);
                 elem.autoplay = true;
-                elem.id = `room_${type}_{participantId}`;
+                elem.id = `room_${type}_${participantId}`;
                 document.body.append(elem);
                 track.attach(elem);                
             }
@@ -121,7 +121,7 @@
                 const type = track.getType();
                 console.log(`removing ${type} track from ${remoteUser ? remoteUser.getDisplayName() : 'unknown user '} from room ${room.getName()}`);
 
-                const elem = document.getElementById(`room_${type}_{participantId}`);
+                const elem = document.getElementById(`room_${type}_${participantId}`);
                 if (elem) {
                     track.detach(elem);
                     elem.remove();

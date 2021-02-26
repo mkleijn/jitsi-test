@@ -11,6 +11,7 @@ const connOptions = {
 
 const initOptions = {
     disableAudioLevels: false,
+    disableSimulcast: true,
     enableAnalyticsLogging: true
 };
 
