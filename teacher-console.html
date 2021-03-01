@@ -22,8 +22,8 @@
 		let paramName = (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000).toString())
 		let displayName = TEACHER_PREFIX + paramName + CONSOLE_SUFFIX;
 		let lobby = null;
-		let room = null;
-		let joinedToRoom = false;
+		let videoRoomName = paramName + '-video';
+		let desktopRoomName = paramName + '-desktop'
 		let connection = null;
 		let peersTree = [];
 
@@ -97,7 +97,7 @@
 			}
 		}
 		
-		function createRoom(name, invitedIds) {	
+		function inviteToRoom(name, invitedIds) {	
 			//send invite to peers through lobby channel
 			for (var i = 0; i < invitedIds.length; i++) {
                 lobby.sendEndpointMessage(invitedIds[i], { command: CMD_JOIN_ROOM, values: { room: name }});
@@ -115,29 +115,27 @@
 	
 		
 		function connectToRoom() {
-            const usersToInvite = [];
+            const videoUsers = [], presentationUsers = [];
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				const nameParts = item.dataset.displayname.split('/');
-				const tree = peersTree[nameParts[0]][nameParts[1]];
-
-				for (const user in tree) {
-					if (!usersToInvite.includes(tree[user].getId())) {
-						usersToInvite.push(tree[user].getId());
-					}
-                }
+				const peer = peersTree[nameParts[0]][nameParts[1]];
+				if (peer['video'])
+					videoUsers.push(peer['video'].getId());
+                if (peer['presentation'])
+                    videoUsers.push(peer['presentation'].getId());
 			});
 
-			//also include own components (so teacher/<my id>/*)
+			//also include own video screen (so teacher/<my id>/video and teacher/<my id>/presentation)
             const nameParts = displayName.split('/');
-            const tree = peersTree[nameParts[0]][nameParts[1]];
-			for (const user in tree) {
-				if (!usersToInvite.includes(tree[user].getId())) {
-                    usersToInvite.push(tree[user].getId());
-                }
-			}
+            const peer = peersTree[nameParts[0]][nameParts[1]];
+            if (peer['video'])
+                videoUsers.push(peer['video'].getId());
+            if (peer['presentation'])
+                presentationUsers.push(peer['presentation'].getId());
 
-            createRoom(paramName, usersToInvite);
+			inviteToRoom(videoRoomName, videoUsers);
+			inviteToRoom(desktopRoomName, presentationUsers);
 		}
 		
 		function disconnect() {
@@ -148,7 +146,6 @@
 		}
 
         function unload() {
-            if (room) room.leave();
             if (lobby) lobby.leave();
             if (connection) connection.disconnect();
         }
