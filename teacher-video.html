@@ -97,7 +97,6 @@
         }).then(tracks => {
             localTracks = tracks;
             lobbyConnection.connect();
-            roomConnection.connect();
         }).catch(error => {
             throw error;
         });
