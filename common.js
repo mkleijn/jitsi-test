@@ -40,3 +40,6 @@ const CMD_JOIN_ROOM = 'join-room';
 //resolutions
 const RES_THUMBNAIL = 180;
 const RES_FULLHD = 1080;
+
+//domain
+JITSI_DOMAIN = 'jitsi.expertcollege.com'; 
