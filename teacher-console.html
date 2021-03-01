@@ -97,31 +97,13 @@
 			}
 		}
 		
-		function createRoom(name, invitedIds) {
-		    room = connection.initJitsiConference(name, confOptions);
-		    room.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onRoomJoined);
-		    room.on(JitsiMeetJS.events.conference.CONFERENCE_LEFT, onRoomLeft);            
-		    room.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoined);
-		    room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
-		    room.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
-			room.setDisplayName(displayName);
-		    room.join();
-			
+		function createRoom(name, invitedIds) {	
 			//send invite to peers through lobby channel
 			for (var i = 0; i < invitedIds.length; i++) {
                 lobby.sendEndpointMessage(invitedIds[i], { command: CMD_JOIN_ROOM, values: { room: name }});
 		    }
 		}
 		
-		function onRoomJoined() {
-			joinedToRoom = true;          
-			document.getElementById('shareScreenBtn').disabled = false;
-		}
-		
-		function onRoomLeft() {
-			joinedToRoom = false;
-			document.getElementById('shareScreenBtn').disabled = true;        
-		}
 		
 		
 		function onUserJoined(id, user) {
@@ -130,15 +112,7 @@
 		
 		function onUserLeft(id) {
 		}
-		
-		function shareScreen() {
-			JitsiMeetJS.createLocalTracks({ devices: [ 'desktop'] }).then(
-				tracks => { 
-					for (var i = 0; i < tracks.length; i++) {
-						room.addTrack(tracks[i]); 
-					}
-				});
-		}
+	
 		
 		function connectToRoom() {
             const usersToInvite = [];
