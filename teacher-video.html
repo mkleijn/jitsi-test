@@ -7,6 +7,12 @@
     <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script> <!-- low level api -->
     <script src='https://jitsi.expertcollege.com/external_api.js'></script> <!-- iframe api -->
     <script src="common.js?v=3"></script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
     <script>
         let params = new URLSearchParams(location.search);
         let displayName = TEACHER_PREFIX + (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
@@ -58,7 +64,10 @@
                 width: '100%',
                 height: '100%',
                 parentNode: document.body,
-                configOverwrite: initOptions
+                configOverwrite: initOptions,
+                userInfo: {
+                    displayName: displayName
+                }
             });
         }
 
