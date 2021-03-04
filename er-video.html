@@ -21,7 +21,7 @@
         let lobby = null;
         let room = null;
         let lobbyConnection = null;
-        let localTracks = null;
+        let thumbVideoTrack = null;
 
         function onLobbyConnectionFailed() {
             console.error('Connection Failed!');
@@ -46,11 +46,8 @@
 
 
         function onLobbyJoined() {
-            lobby.setSenderVideoConstraint(RES_THUMBNAIL);
-            for (var i = 0; i < localTracks.length; i++) {
-                if (localTracks[i].getType() === 'video') {
-                    lobby.addTrack(localTracks[i]);
-                }
+            if (thumbVideoTrack) {
+                lobby.addTrack(thumbVideoTrack);
             }
         }
 
@@ -76,11 +73,9 @@
             room.executeCommand('setVideoQuality', RES_FULLHD);
         }
 
-        function unload() {
-            for (let i = 0; i < localTracks.length; i++) {
-                localTracks[i].dispose();
-            }
 
+        function unload() {
+            if (thumbVideoTrack) thumbVideoTrack.dispose();
             if (room) room.dispose();
             if (lobby) lobby.leave();
             if (lobbyConnection) lobbyConnection.disconnect();
@@ -96,19 +91,18 @@
         lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onLobbyDisconnect);
 
         JitsiMeetJS.createLocalTracks({
-            devices: ['audio', 'video'],
-            resolution: 1080,
+            devices: ['video'],
+            resolution: RES_THUMBNAIL,
             constraints: {
                 video: {
                     height: {
-                        ideal: 1080,
-                        max: 1080,
-                        min: 240
+                        ideal: RES_THUMBNAIL,
+                        max: RES_THUMBNAIL
                     }
                 }
             }
         }).then(tracks => {
-            localTracks = tracks;
+            thumbVideoTrack = tracks[0];
             lobbyConnection.connect();
         }).catch(error => {
             throw error;

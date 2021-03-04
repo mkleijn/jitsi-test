@@ -1,10 +1,13 @@
+//domain
+const JITSI_DOMAIN = 'jitsi.expertcollege.com'; 
+
 const connOptions = {
     hosts: {
-        domain: 'jitsi.expertcollege.com',
-        muc: 'conference.jitsi.expertcollege.com' // FIXME: use XEP-0030
+        domain: JITSI_DOMAIN,
+        muc: `conference.${JITSI_DOMAIN}`
     },
-    bosh: '//jitsi.expertcollege.com/http-bind', // FIXME: use xep-0156 for that
-    //websocket: 'wss://jitsi.expertcollege.com/xmpp-websocket',
+    bosh: `//${JITSI_DOMAIN}/http-bind`, 
+    //websocket: `wss://{JITSI_DOMAIN}/xmpp-websocket`,
     // The name of client node advertised in XEP-0115 'c' stanza
     clientNode: 'http://jitsi.org/jitsimeet'
 };
@@ -32,12 +35,17 @@ const confOptions = {
 
 
 //display name pre- and suffix
-const TEACHER_PREFIX = 'teacher/';
-const ER_PREFIX = 'experienceroom/';
+const TEACHER_PREFIX = 't/';
+const ER_PREFIX = 'er/';
 const VIDEOSCREEN_SUFFIX = '/video';
 const CONSOLE_SUFFIX = '/console';
 const PRESENTATION_SUFFIX = '/presentation';
 const TABLET_SUFFIX = '/tablet';
+
+//meeting suffix (Jitsi only allows one video feed per user per meeting, so we use seperate meetings for video & desktopsharing)
+const VIDEO_MEETING_SUFFIX = '-video';
+const DESKTOP_MEETING_SUFFIX = '-desktop';
+
 
 //rooms
 const ROOM_LOBBY = 'lobby';
@@ -49,8 +57,7 @@ const CMD_JOIN_ROOM = 'join-room';
 
 	
 //resolutions
-const RES_THUMBNAIL = 180;
+const RES_THUMBNAIL = 240;
 const RES_FULLHD = 1080;
 
-//domain
-JITSI_DOMAIN = 'jitsi.expertcollege.com'; 
+

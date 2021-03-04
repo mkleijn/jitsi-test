@@ -20,7 +20,7 @@
         let displayName = TEACHER_PREFIX + (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000)) + VIDEOSCREEN_SUFFIX;
         let lobby = null;
         let lobbyConnection = null;
-        let localTracks = null;
+        let thumbVideoTrack = null;
         let room = null;
 
         function onLobbyConnectionFailed() {
@@ -45,21 +45,18 @@
 
 
         function onLobbyJoined() {
-            lobby.setSenderVideoConstraint(RES_THUMBNAIL);
-            for (var i = 0; i < localTracks.length; i++) {
-                if (localTracks[i].getType() === 'video') {
-                    lobby.addTrack(localTracks[i]);
-                }
-            }
+            if (thumbVideoTrack)
+                lobby.addTrack(thumbVideoTrack);
         }
 
         function onLobbyMessageReceived(from, message) {
             if (message && message.command === CMD_JOIN_ROOM) {
-                joinRoom(message.values.room);
+                joinRoom(message.values.room, message.values.invitees);
+
             }
         }
 
-        function joinRoom(name) {
+        function joinRoom(name, invitees) {
             if (room) room.dispose();
             room = new JitsiMeetExternalAPI(JITSI_DOMAIN, {
                 roomName: name,
@@ -73,14 +70,21 @@
                 }
             });
             room.executeCommand('setVideoQuality', RES_FULLHD);
+
+            //invite other participants from lobby:
+            for (var i = 0; i < invitees.length; i++) {
+                lobby.sendEndpointMessage(invitees[i], {
+                    command: CMD_JOIN_ROOM,
+                    values: {
+                        room: name
+                    }
+                });
+            }
         }
 
 
         function unload() {
-            for (let i = 0; i < localTracks.length; i++) {
-                localTracks[i].dispose();
-            }
-
+            if (thumbVideoTrack) thumbVideoTrack.dispose();
             if (room) room.dispose();
             if (lobby) lobby.leave();
             if (lobbyConnection) lobbyConnection.disconnect();
@@ -96,19 +100,18 @@
         lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onLobbyDisconnect);
 
         JitsiMeetJS.createLocalTracks({
-            devices: ['audio', 'video'],
-            resolution: 1080,
+            devices: ['video'],
+            resolution: RES_THUMBNAIL,
             constraints: {
                 video: {
                     height: {
-                        ideal: 1080,
-                        max: 1080,
-                        min: 240
+                        ideal: RES_THUMBNAIL,
+                        max: RES_THUMBNAIL
                     }
                 }
             }
         }).then(tracks => {
-            localTracks = tracks;
+            thumbVideoTrack = tracks[0];
             lobbyConnection.connect();
         }).catch(error => {
             throw error;

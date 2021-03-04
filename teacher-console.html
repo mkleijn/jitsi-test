@@ -13,27 +13,28 @@
 		#lobbyVideogrid li video { margin:0px; padding:0px; width: 160px; height: 90px; }
 		
 	</style>
-      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://jitsi.expertcollege.com/libs/lib-jitsi-meet.min.js"></script>
     <script src="common.js?v=4"></script>
     <script>
 		let params = new URLSearchParams(location.search);
-		let paramName = (params.has('id') ? params.get('id') : Math.floor(Math.random() * 10000).toString())
+		let paramName = (params.has('id') ? params.get('id').toLowerCase() : Math.floor(Math.random() * 10000).toString())
 		let displayName = TEACHER_PREFIX + paramName + CONSOLE_SUFFIX;
 		let lobby = null;
-		let videoRoomName = paramName + '-video';
-		let desktopRoomName = paramName + '-desktop'
+        let videoRoomName = paramName + VIDEO_MEETING_SUFFIX;
+		let desktopRoomName = paramName + DESKTOP_MEETING_SUFFIX;
 		let connection = null;
 		let peersTree = [];
+		let localTracks = [];
 
 		function onLobbyJoined() {
 		    console.log('joined lobby successfully!');                                         
 		}
 		
 		function onUserJoinedLobby(id, user) {
+			//build a tree based on the {role}/{roomname}/{devicetype} format of the displayname
 			var nameparts = user.getDisplayName().split('/');
-
 			if (peersTree[nameparts[0]] == undefined) {
 				peersTree[nameparts[0]] = [];
 			}
@@ -97,11 +98,16 @@
 			}
 		}
 		
-		function inviteToRoom(name, invitedIds) {	
-			//send invite to peers through lobby channel
-			for (var i = 0; i < invitedIds.length; i++) {
-                lobby.sendEndpointMessage(invitedIds[i], { command: CMD_JOIN_ROOM, values: { room: name }});
-		    }
+		function inviteToRoom(name, self, invitedIds) {	
+			//send invite through lobby channel to 'own' video or presentation app, and have them invite the other peers
+			//by having the video or presentation app invite the peers, we guarantee they are first in the room and therefore moderator
+			lobby.sendEndpointMessage(self, {
+				command: CMD_JOIN_ROOM,
+				values: {
+					room: name,
+					invitees: invitedIds
+				}
+			});
 		}
 		
 		
@@ -116,6 +122,7 @@
 		
 		function connectToRoom() {
             const videoUsers = [], presentationUsers = [];
+			let selfVideo = null, selfPresentation = null;
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				const nameParts = item.dataset.displayname.split('/');
@@ -130,12 +137,15 @@
             const nameParts = displayName.split('/');
             const peer = peersTree[nameParts[0]][nameParts[1]];
             if (peer['video'])
-                videoUsers.push(peer['video'].getId());
+                selfVideo = peer['video'].getId();
             if (peer['presentation'])
-                presentationUsers.push(peer['presentation'].getId());
+                selfPresentation = peer['presentation'].getId();
 
-			inviteToRoom(videoRoomName, videoUsers);
-			inviteToRoom(desktopRoomName, presentationUsers);
+            inviteToRoom(videoRoomName, selfVideo, videoUsers);
+			inviteToRoom(desktopRoomName, selfPresentation, presentationUsers);
+
+			$("#roomPage").show();
+            $("#lobbyPage").hide();
 		}
 		
 		function disconnect() {
@@ -152,12 +162,37 @@
 		
 		JitsiMeetJS.init();		
         JitsiMeetJS.setLogLevel(JitsiMeetJS.logLevels.ERROR);
-		connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
-		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
-		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
-		connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
-		connection.connect();
-		
+
+		//use virtual camera and virtual mic as video/audio source for screen sharing
+		JitsiMeetJS.mediaDevices.enumerateDevices((devices) => {
+			const virtualCam = devices.filter(d => d.kind === 'videoinput' && d.label.toLowerCase().includes('virtual'));
+			const virtualMic = devices.filter(d => d.kind === 'audioinput' && d.label.toLowerCase().includes('virtual'));
+
+			JitsiMeetJS.createLocalTracks({
+                devices: ['video', 'audio'],
+                resolution: RES_FULLHD,
+                constraints: {
+                    video: {
+                        height: {
+                            ideal: RES_FULLHD,
+                            max: RES_FULLHD
+                        }
+                    }
+				},
+				cameraDeviceId: virtualCam ? virtualCam.deviceId : undefined,
+                micDeviceId: virtualMic ? virtualMic.deviceId : undefined
+            }).then(tracks => {
+                localTracks = tracks;
+            }).catch(error => {
+                throw error;
+            });
+		});
+
+        connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+        connection.connect();
 		
 		$(function() {
 			$("#lobbyVideogrid").selectable();
@@ -165,8 +200,8 @@
 		});
   </script>
 </head>
-<body>
-  <div id="lobbyPage" onunload="unload();">
+<body onunload="unload();">
+  <div id="lobbyPage" >
   	<ol id="lobbyVideogrid"></ol>
 	<button id="connectButton" type='button' onclick='connectToRoom()'>Connect to selected rooms</button>
   </div>
