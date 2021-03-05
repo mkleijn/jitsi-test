@@ -121,25 +121,29 @@
 	
 		
 		function connectToRoom() {
-            const videoUsers = [], presentationUsers = [];
+			const videoUsers = [],
+				presentationUsers = [],
+				videoKey = VIDEOSCREEN_SUFFIX.substring(1),
+				presentationKey = PRESENTATION_SUFFIX.substring(1);
+
 			let selfVideo = null, selfPresentation = null;
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				const nameParts = item.dataset.displayname.split('/');
 				const peer = peersTree[nameParts[0]][nameParts[1]];
-				if (peer['video'])
-					videoUsers.push(peer['video'].getId());
-                if (peer['presentation'])
-                    presentationUsers.push(peer['presentation'].getId());
+                if (peer[videoKey])
+                    videoUsers.push(peer[videoKey].getId());
+                if (peer[presentationKey])
+                    presentationUsers.push(peer[presentationKey].getId());
 			});
 
 			//also include own video screen (so teacher/<my id>/video and teacher/<my id>/presentation)
             const nameParts = displayName.split('/');
             const peer = peersTree[nameParts[0]][nameParts[1]];
-            if (peer['video'])
-                selfVideo = peer['video'].getId();
-            if (peer['presentation'])
-                selfPresentation = peer['presentation'].getId();
+            if (peer[videoKey])
+                selfVideo = peer[videoKey].getId();
+            if (peer[presentationKey])
+                selfPresentation = peer[presentationKey].getId();
 
             inviteToRoom(videoRoomName, selfVideo, videoUsers);
 			inviteToRoom(desktopRoomName, selfPresentation, presentationUsers);
