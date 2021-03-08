@@ -1,5 +1,5 @@
 //domain
-const JITSI_DOMAIN = 'jitsi.expertcollege.com'; 
+const JITSI_DOMAIN = 'onprem-jitsi.expertcollege.com'; 
 
 const connOptions = {
     hosts: {
@@ -7,7 +7,8 @@ const connOptions = {
         muc: `conference.${JITSI_DOMAIN}`
     },
     bosh: `//${JITSI_DOMAIN}/http-bind`, 
-    //websocket: `wss://{JITSI_DOMAIN}/xmpp-websocket`,
+    websocket: `wss://${JITSI_DOMAIN}/xmpp-websocket`,
+
     // The name of client node advertised in XEP-0115 'c' stanza
     clientNode: 'http://jitsi.org/jitsimeet'
 };
