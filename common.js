@@ -13,21 +13,8 @@ const connOptions = {
     clientNode: 'http://jitsi.org/jitsimeet'
 };
 
-const interfaceOptions = {
-    APP_NAME: 'eXperienceroom',
-    DEFAULT_BACKGROUND: '#2ea3f2',
-    DEFAULT_LOCAL_DISPLAY_NAME: 'me',
-    DEFAULT_LOGO_URL: '',
-    DEFAULT_REMOTE_DISPLAY_NAME: '',
-    DEFAULT_WELCOME_PAGE_LOGO_URL: '',
-    DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-    
-};
 
 const initOptions = {
-    disableAudioLevels: false,
-    disableSimulcast: true,
-    enableAnalyticsLogging: true
 };
 
 const confOptions = {
