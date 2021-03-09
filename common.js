@@ -59,6 +59,6 @@ const CMD_JOIN_ROOM = 'join-room';
 	
 //resolutions
 const RES_THUMBNAIL = 240;
-const RES_FULLHD = 1080;
+const RES_FULLHD = 2160;
 
 
