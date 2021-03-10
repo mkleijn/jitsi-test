@@ -39,7 +39,7 @@ const connOptions = {
     maxBitratesVideo: {
         low: 400000,
         standard: 1000000,
-        high: 3000000
+        high: 4000000
     }
 };
 
