@@ -62,7 +62,7 @@
 		
 		function onConnectionSuccess() {
 		    console.log('conncection successfull!');
-		    lobby = connection.initJitsiConference(ROOM_LOBBY, confOptions);
+		    lobby = lobbyConnection.initJitsiConference(ROOM_LOBBY, confOptions);
 		    lobby.on(JitsiMeetJS.events.conference.USER_JOINED, onUserJoinedLobby);
 		    lobby.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeftLobby);
 		    lobby.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, onLobbyJoined);			
@@ -171,7 +171,7 @@
 			inviteToRoom(videoRoomName, selfVideo, videoUsers);
 
 			//join self the presentation room, to share screen through virtual cam
-            presentation = connection.initJitsiConference(desktopRoomName, confOptions);            
+            presentation = presentationConnection.initJitsiConference(desktopRoomName, confOptions);            
             presentation.setDisplayName(displayName);
             presentation.join();        
 
@@ -185,14 +185,17 @@
 		
 		function disconnect() {
 			console.log('disconnecting');
-			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
-			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
-			connection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+			lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+			lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+			lobbyConnection.removeEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
 		}
 
         function unload() {
-            if (lobby) lobby.leave();
-            if (connection) connection.disconnect();
+			if (lobby) lobby.leave();
+			if (presentation) presentation.leave();
+
+			if (lobbyConnection) lobbyConnection.disconnect();
+			if (presentationConnection) presentationConnection.disconnect();
         }
 		
 		JitsiMeetJS.init();		
@@ -230,6 +233,7 @@
         lobbyConnection.connect();
 
 		presentationConnection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+		presentationConnection.connect();
 
 		$(function() {
 			$("#lobbyVideogrid").selectable();
