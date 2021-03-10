@@ -99,7 +99,9 @@
                 }
             });
             room.executeCommand('setVideoQuality', RES_FULLHD);
-            room.setLargeVideoParticipant(invitor.getId());
+            const invitorId = invitor.getId();
+            room.pinParticipant(invitorId);
+            room.setLargeVideoParticipant(invitorId);
         }
 
 
