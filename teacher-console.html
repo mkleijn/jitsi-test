@@ -215,8 +215,8 @@
 
 		//use virtual camera and virtual mic as video/audio source for screen sharing
 		JitsiMeetJS.mediaDevices.enumerateDevices((devices) => {
-			const virtualCam = devices.filter(d => d.kind === 'videoinput' && d.label.toLowerCase().includes('virtual'));
-			const virtualMic = devices.filter(d => d.kind === 'audioinput' && d.label.toLowerCase().includes('virtual'));
+			const virtualCam = devices.find(d => d.kind === 'videoinput' && d.label.toLowerCase().includes('virtual'));
+			const virtualMic = devices.find(d => d.kind === 'audioinput' && d.label.toLowerCase().includes('virtual'));
 
 			JitsiMeetJS.createLocalTracks({
                 devices: ['video', 'audio'],
