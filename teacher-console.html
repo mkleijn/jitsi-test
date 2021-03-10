@@ -132,21 +132,24 @@
 			//include selected video feeds participant, and all related components (so experienceroom/<selected item>/*)
 			$('#lobbyVideogrid li.ui-selected').each((_, item) => {
 				const nameParts = item.dataset.displayname.split('/');
-				const peer = peersTree[nameParts[0]][nameParts[1]];
-                if (peer[videoKey])
-                    videoUsers.push(peer[videoKey].getId());
-                if (peer[presentationKey])
-                    presentationUsers.push(peer[presentationKey].getId());
+				if (peersTree[nameParts[0]]) {
+					const peer = peersTree[nameParts[0]][nameParts[1]];
+					if (peer[videoKey])
+						videoUsers.push(peer[videoKey].getId());
+					if (peer[presentationKey])
+						presentationUsers.push(peer[presentationKey].getId());
+				}
 			});
 
 			//also include own video screen (so teacher/<my id>/video and teacher/<my id>/presentation)
-            const nameParts = displayName.split('/');
-            const peer = peersTree[nameParts[0]][nameParts[1]];
-            if (peer[videoKey])
-                selfVideo = peer[videoKey].getId();
-            if (peer[presentationKey])
-                selfPresentation = peer[presentationKey].getId();
-
+			const nameParts = displayName.split('/');
+			if (peersTree[nameParts[0]]) {
+				const peer = peersTree[nameParts[0]][nameParts[1]];
+				if (peer[videoKey])
+					selfVideo = peer[videoKey].getId();
+				if (peer[presentationKey])
+					selfPresentation = peer[presentationKey].getId();
+			}
             inviteToRoom(videoRoomName, selfVideo, videoUsers);
 			inviteToRoom(desktopRoomName, selfPresentation, presentationUsers);
 
