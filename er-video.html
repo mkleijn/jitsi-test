@@ -22,6 +22,7 @@
         let room = null;
         let lobbyConnection = null;
         let thumbVideoTrack = null;
+        let localDevices = null;
 
         function onLobbyConnectionFailed() {
             console.error('Connection Failed!');
@@ -76,6 +77,11 @@
                 },
                 userInfo: {
                     displayName: displayName
+                },
+                devices: {
+                    videoInput: localDevices.find(d => d.kind === 'videoinput' && !d.label.toLowerCase().includes('virtual')).label,
+                    audioInput: localDevices.find(d => d.kind === 'audioinput' && !d.label.toLowerCase().includes('virtual')).label,
+                    audioOutput: localDevices.find(d => d.kind === 'audiooutput').label
                 }
             });
             room.executeCommand('setVideoQuality', RES_FULLHD);
@@ -97,6 +103,8 @@
         lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onLobbyConnectionSuccess);
         lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onLobbyConnectionFailed);
         lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, onLobbyDisconnect);
+
+        JitsiMeetJS.mediaDevices.enumerateDevices((devices) => localDevices = devices);
 
         JitsiMeetJS.createLocalTracks({
             devices: ['video'],
