@@ -69,11 +69,11 @@
         //message handler for any messages broadcast in Lobby room
         function onLobbyMessageReceived(from, message) {
             if (message && message.command === CMD_JOIN_ROOM) {
-                joinRoom(message.values.room);
+                joinRoom(message.values.room, from);
             }
         }
 
-        function joinRoom(name) {
+        function joinRoom(name, invitor) {
             if (room) room.dispose();
             if (thumbVideoTrack) thumbVideoTrack.dispose(); //need to dispose thumbvideo for now, otherwise the camera will not be avalable to use
 
@@ -101,6 +101,7 @@
                 }
             });
             room.executeCommand('setVideoQuality', RES_FULLHD);
+            room.setLargeVideoParticipant(invitor);
         }
 
 
