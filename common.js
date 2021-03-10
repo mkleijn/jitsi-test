@@ -10,12 +10,39 @@ const connOptions = {
     websocket: `wss://${JITSI_DOMAIN}/xmpp-websocket`,
 
     // The name of client node advertised in XEP-0115 'c' stanza
-    clientNode: 'http://jitsi.org/jitsimeet'
-};
+    clientNode: 'http://jitsi.org/jitsimeet',
 
 
-const initOptions = {
+    disableAudioLevels: false,
+    enableNoAudioDetection: false,
+    enableNoisyMicDetection: false,
+    opusMaxAverageBitrate: 510000,
+    maxFullResolutionParticipants: -1,
+    resolution: 2160,
+    constraints: {
+        video: {
+            height: {
+                max: 2160,
+                ideal: 2160,
+                min: 720
+            }
+        }
+    },
+    disableSimulcast: true,
+    enableLayerSuspension: false,
+    p2p: {
+        preferredCodec: 'VP9'
+    },
+    videoQuality: {
+        preferredCodec: 'VP9'
+    },
+    maxBitratesVideo: {
+        low: 400000,
+        standard: 1000000,
+        high: 3000000
+    }
 };
+
 
 const confOptions = {
     openBridgeChannel: true
