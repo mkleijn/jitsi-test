@@ -47,9 +47,23 @@
 
 
         function onLobbyJoined() {
-            if (thumbVideoTrack) {
+            JitsiMeetJS.createLocalTracks({
+                devices: ['video'],
+                resolution: RES_THUMBNAIL,
+                constraints: {
+                    video: {
+                        height: {
+                            ideal: RES_THUMBNAIL,
+                            min: RES_THUMBNAIL
+                        }
+                    }
+                }
+            }).then(tracks => {
+                thumbVideoTrack = tracks[0];
                 lobby.addTrack(thumbVideoTrack);
-            }
+            }).catch(error => {
+                throw error;
+            });
         }
 
         //message handler for any messages broadcast in Lobby room
@@ -61,6 +75,8 @@
 
         function joinRoom(name) {
             if (room) room.dispose();
+            if (thumbVideoTrack) thumbVideoTrack.dispose(); //need to dispose thumbvideo for now, otherwise the camera will not be avalable to use
+
             room = new JitsiMeetExternalAPI(JITSI_DOMAIN, {
                 roomName: name,
                 width: '100%',
@@ -70,7 +86,7 @@
                 interfaceConfigOverwrite: {
                     APP_NAME: 'Experience room',
                     DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-                    //TOOLBAR_BUTTONS: [],
+                    TOOLBAR_BUTTONS: [],
                     VIDEO_QUALITY_LABEL_DISABLED: true,
 
 
@@ -106,23 +122,7 @@
 
         JitsiMeetJS.mediaDevices.enumerateDevices((devices) => localDevices = devices);
 
-        JitsiMeetJS.createLocalTracks({
-            devices: ['video'],
-            resolution: RES_THUMBNAIL,
-            constraints: {
-                video: {
-                    height: {
-                        ideal: RES_THUMBNAIL,
-                        min: RES_THUMBNAIL
-                    }
-                }
-            }
-        }).then(tracks => {
-            thumbVideoTrack = tracks[0];
-            lobbyConnection.connect();
-        }).catch(error => {
-            throw error;
-        });
+        lobbyConnection.connect();
     </script>
 </head>
 <body onunload="unload();">
