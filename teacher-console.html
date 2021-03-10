@@ -21,10 +21,12 @@
 		let params = new URLSearchParams(location.search);
 		let paramName = (params.has('id') ? params.get('id').toLowerCase() : Math.floor(Math.random() * 10000).toString())
 		let displayName = TEACHER_PREFIX + paramName + CONSOLE_SUFFIX;
-		let lobby = null;
+		let lobby, presentation = null;
         let videoRoomName = paramName + VIDEO_MEETING_SUFFIX;
 		let desktopRoomName = paramName + DESKTOP_MEETING_SUFFIX;
-		let connection = null;
+		let lobbyConnection = null;
+		let presentationConnection = null;
+		
 		let peersTree = [];
 		let localTracks = [];
 
@@ -120,8 +122,22 @@
 		
 		function onUserLeft(id) {
 		}
-	
-		
+
+		function shareScreen() {
+			//share screen and audio by adding the local tracks
+			for (var i = 0; i < localTracks.length; i++) {
+				presentation.addTrack(localTracks[i]);
+            }
+        }
+
+
+		function stopShareScreen() {
+			//remove local tracks to stop sharing
+            for (var i = 0; i < localTracks.length; i++) {
+                presentation.removeTrack(localTracks[i]);
+            }
+        }
+
 		function connectToRoom() {
 			const videoUsers = [],
 				presentationUsers = [],
@@ -150,8 +166,18 @@
 				if (peer[presentationKey])
 					selfPresentation = peer[presentationKey].getId();
 			}
-            inviteToRoom(videoRoomName, selfVideo, videoUsers);
-			inviteToRoom(desktopRoomName, selfPresentation, presentationUsers);
+
+			//invite other components to join video room
+			inviteToRoom(videoRoomName, selfVideo, videoUsers);
+
+			//join self the presentation room, to share screen through virtual cam
+            presentation = connection.initJitsiConference(desktopRoomName, confOptions);            
+            presentation.setDisplayName(displayName);
+            presentation.join();        
+
+			//and invite other components to join newly created presentation room
+            inviteToRoom(desktopRoomName, selfPresentation, presentationUsers);
+
 
 			$("#roomPage").show();
             $("#lobbyPage").hide();
@@ -197,12 +223,14 @@
             });
 		});
 
-        connection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
-        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
-        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
-        connection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
-        connection.connect();
-		
+        lobbyConnection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+        lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+        lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
+        lobbyConnection.addEventListener(JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
+        lobbyConnection.connect();
+
+		presentationConnection = new JitsiMeetJS.JitsiConnection(null, null, connOptions);
+
 		$(function() {
 			$("#lobbyVideogrid").selectable();
 			$("#roomPage").hide();
@@ -215,7 +243,9 @@
 	<button id="connectButton" type='button' onclick='connectToRoom()'>Connect to selected rooms</button>
   </div>
   <div id="roomPage">
-	<button id='shareScreenBtn' type='button' onclick='shareScreen()' disabled>share screen</button>
+  	<button id='shareScreenBtn' type='button' onclick='shareScreen()'>share screen</button>
+  	<button id='stopShareScreenBtn' type='button' onclick='stopShareScreen()'>share screen</button>
+  	<button id='exitBtn' type='button' onclick='exit()' disabled>share screen</button>
   </div>
 </body>
 </html>
