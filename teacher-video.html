@@ -75,7 +75,7 @@
                 devices: {
                     videoInput: localDevices.find(d => d.kind === 'videoinput' && !d.label.toLowerCase().includes('virtual')).label,
                     audioInput: localDevices.find(d => d.kind === 'audioinput' && !d.label.toLowerCase().includes('virtual')).label,
-                    audioOutput: localDevices.find(d => d.kind === 'audiooutput').label
+                    audioOutput: localDevices.find(d => d.kind === 'audiooutput' && !d.label.toLowerCase().includes('virtual')).label
                 }
             });
             room.executeCommand('setVideoQuality', RES_FULLHD);
