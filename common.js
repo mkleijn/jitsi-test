@@ -12,6 +12,7 @@ const connOptions = {
     // The name of client node advertised in XEP-0115 'c' stanza
     clientNode: 'http://jitsi.org/jitsimeet',
 
+    disableTileView: true,
 
     disableAudioLevels: false,
     enableNoAudioDetection: false,
