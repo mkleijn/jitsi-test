@@ -103,15 +103,27 @@
 		}
 		
 		function inviteToRoom(name, self, invitedIds) {	
-			//send invite through lobby channel to 'own' video or presentation app, and have them invite the other peers
-			//by having the video or presentation app invite the peers, we guarantee they are first in the room and therefore moderator
-			lobby.sendEndpointMessage(self, {
-				command: CMD_JOIN_ROOM,
-				values: {
-					room: name,
-					invitees: invitedIds
+			if (self) {
+				//send invite through lobby channel to 'own' video or presentation app, and have them invite the other peers
+				//by having the video or presentation app invite the peers, we guarantee they are first in the room and therefore moderator
+				lobby.sendEndpointMessage(self, {
+					command: CMD_JOIN_ROOM,
+					values: {
+						room: name,
+						invitees: invitedIds
+					}
+				});
+			} else {
+				//no 'own' component available, so invite the 'other' invitees directly
+                for (var i = 0; i < invitedIds.length; i++) {
+                    lobby.sendEndpointMessage(invitedIds[i], {
+                        command: CMD_JOIN_ROOM,
+                        values: {
+                            room: name
+                        }
+                    });
 				}
-			});
+			}
 		}
 		
 		
@@ -248,8 +260,8 @@
   </div>
   <div id="roomPage">
   	<button id='shareScreenBtn' type='button' onclick='shareScreen()'>share screen</button>
-  	<button id='stopShareScreenBtn' type='button' onclick='stopShareScreen()'>share screen</button>
-  	<button id='exitBtn' type='button' onclick='exit()' disabled>share screen</button>
+  	<button id='stopShareScreenBtn' type='button' onclick='stopShareScreen()'>stop share screen</button>
+  	<button id='exitBtn' type='button' onclick='exit()' disabled>exit</button>
   </div>
 </body>
 </html>
