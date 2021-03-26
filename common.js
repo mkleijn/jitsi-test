@@ -29,8 +29,8 @@ const connOptions = {
             }
         }
     },
-    disableSimulcast: true,
-    enableLayerSuspension: false,
+    disableSimulcast: false,
+    enableLayerSuspension: true,
     p2p: {
         preferredCodec: 'VP9'
     },
@@ -38,9 +38,9 @@ const connOptions = {
         preferredCodec: 'VP9'
     },
     maxBitratesVideo: {
-        low: 400000,
-        standard: 1000000,
-        high: 4000000
+        low: 1 * 1024 * 1024,
+        standard: 4 * 1024 * 1024,
+        high: 8 * 1024 * 1024
     }
 };
 
